@@ -1,3 +1,89 @@
+// Storage Controller
+
+const StorageCtrl = (function () {
+
+    return {
+        storeItem: function (item) {
+
+            let items;
+
+            if (localStorage.getItem('items') === null) {
+
+                items = [];
+
+                items.push(item);
+
+                localStorage.setItem('items', JSON.stringify(items));
+
+            } else {
+
+                items = JSON.parse(localStorage.getItem('items'));
+
+                items.push(item);
+
+                localStorage.setItem('items', JSON.stringify(items));
+
+            }
+
+        },
+        getItemsFromStorage: function () {
+
+            let items;
+
+            if (localStorage.getItem('items') === null) {
+
+                items = [];
+
+            } else {
+                items = JSON.parse(localStorage.getItem('items'));
+
+            }
+            return items;
+        },
+        updateItemStorage: function (updatedItem) {
+
+            let items = JSON.parse(localStorage.getItem('items'));
+
+            items.forEach(function (item, index) {
+
+                if (updatedItem.id === item.id) {
+
+                    items.splice(index, 1, updatedItem);
+                }
+
+            });
+
+            localStorage.setItem('items', JSON.stringify(items));
+
+
+
+        },
+        deleteItemFromStorage: function (id) {
+
+            let items = JSON.parse(localStorage.getItem('items'));
+
+            items.forEach(function (item, index) {
+
+                if (id === item.id) {
+
+                    items.splice(index, 1);
+                }
+
+            });
+
+            localStorage.setItem('items', JSON.stringify(items));
+
+        },
+        clearItemsFromStorage: function () {
+            localStorage.removeItem('items');
+        }
+
+    }
+
+})();
+
+
+
 // Item Controller
 const ItemCtrl = (function () {
     // Item Constructor
@@ -10,11 +96,7 @@ const ItemCtrl = (function () {
     // Data Structure
     const data = {
 
-        items: [
-            // { id: 0, name: 'Steak', calories: 1200 },
-            // { id: 1, name: 'Cookie', calories: 400 },
-            // { id: 2, name: 'Eggs', calories: 300 },
-        ],
+        items: StorageCtrl.getItemsFromStorage(),
 
         currentItem: null,
 
@@ -146,8 +228,6 @@ const UICtrl = (function () {
         itemCaloriesInput: '#item-calories',
         totalCalories: '.total-calories',
 
-
-
     }
 
     return {
@@ -274,13 +354,10 @@ const UICtrl = (function () {
             document.querySelector(UISelectors.backBtn).style.display = 'inline';
             document.querySelector(UISelectors.addBtn).style.display = 'none';
 
-
-
         },
         getSelectors: function () {
             return UISelectors;
         }
-
 
     }
 
@@ -289,7 +366,7 @@ const UICtrl = (function () {
 
 
 // App Controller
-const App = (function (ItemCtrl, UICtrl) {
+const App = (function (ItemCtrl, StorageCtrl, UICtrl) {
 
     const loadEventListeners = function () {
 
@@ -332,6 +409,8 @@ const App = (function (ItemCtrl, UICtrl) {
 
             UICtrl.showTotalCalories(totalCalories);
 
+            StorageCtrl.storeItem(newItem);
+
             UICtrl.clearInput();
 
         }
@@ -356,8 +435,6 @@ const App = (function (ItemCtrl, UICtrl) {
 
             UICtrl.addItemToForm();
 
-
-
         }
 
         e.preventDefault();
@@ -374,6 +451,8 @@ const App = (function (ItemCtrl, UICtrl) {
         const totalCalories = ItemCtrl.getTotalCalories();
 
         UICtrl.showTotalCalories(totalCalories);
+
+        StorageCtrl.updateItemStorage(updatedItem);
 
         UICtrl.clearEditState();
 
@@ -394,14 +473,11 @@ const App = (function (ItemCtrl, UICtrl) {
 
         UICtrl.showTotalCalories(totalCalories);
 
+        StorageCtrl.deleteItemFromStorage(currentItem.id);
+
         UICtrl.clearEditState();
 
-
-
-
         e.preventDefault();
-
-
 
     }
 
@@ -414,6 +490,8 @@ const App = (function (ItemCtrl, UICtrl) {
         UICtrl.showTotalCalories(totalCalories);
 
         UICtrl.removeItems();
+
+        StorageCtrl.clearItemsFromStorage();
 
         UICtrl.hideList();
 
@@ -445,14 +523,10 @@ const App = (function (ItemCtrl, UICtrl) {
             // Load event listeners
             loadEventListeners();
 
-
-
-
-
         }
     }
 
 
-})(ItemCtrl, UICtrl);
+})(ItemCtrl, StorageCtrl, UICtrl);
 
 App.init();
