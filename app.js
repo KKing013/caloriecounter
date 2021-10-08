@@ -195,6 +195,7 @@ const ItemCtrl = (function () {
             let total = 0;
 
             data.items.forEach(function (item) {
+
                 total += item.calories;
 
             });
@@ -204,6 +205,7 @@ const ItemCtrl = (function () {
             return data.totalCalories;
 
         },
+
         logData: function () {
             return data;
         }
@@ -288,6 +290,7 @@ const UICtrl = (function () {
                 const itemID = listItem.getAttribute('id');
 
                 if (itemID === `item-${item.id}`) {
+
                     document.querySelector(`#${itemID}`).innerHTML =
                         `<strong>${item.name}: </strong><em>${item.calories} Calories</em>
                     <a href="#" class="secondary-content">
@@ -511,6 +514,7 @@ const App = (function (ItemCtrl, StorageCtrl, UICtrl) {
                 UICtrl.hideList();
 
             } else {
+                // Populate list with items
                 UICtrl.populateItemList(items);
 
             }
@@ -518,8 +522,6 @@ const App = (function (ItemCtrl, StorageCtrl, UICtrl) {
             const totalCalories = ItemCtrl.getTotalCalories();
             // Add total calories to UI
             UICtrl.showTotalCalories(totalCalories);
-            // Populate list with items
-            UICtrl.populateItemList(items);
             // Load event listeners
             loadEventListeners();
 
